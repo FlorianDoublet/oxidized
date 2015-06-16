@@ -179,7 +179,9 @@ class Git < Output
         :parents    => repo.empty? ? [] : [repo.head.target].compact,
         :update_ref => 'HEAD',
       )
+      
       index.write
+      true
     end
   end
 end

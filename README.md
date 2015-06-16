@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/oxidized.svg)](http://badge.fury.io/rb/oxidized)
 
-Oxidized is a network device configuration backup tool. It's a RANCID replacment!
+Oxidized is a network device configuration backup tool. It's a RANCID replacement!
 
 * automatically adds/removes threads to meet configured retrieval interval
 * restful API to move node immediately to head-of-queue (GET/POST /node/next/[NODE])
@@ -27,6 +27,7 @@ Oxidized is a network device configuration backup tool. It's a RANCID replacment
     * [Privileged mode](#privileged-mode)
     * [Source: CSV](#source-csv)
     * [Source: SQLite](#source-sqlite)
+    * [Source: HTTP](#source-http)
     * [Output: GIT](#output-git)
     * [Output: File](#output-file)
     * [Advanced Configuration](#advanced-configuration)
@@ -67,6 +68,7 @@ Oxidized is a network device configuration backup tool. It's a RANCID replacment
  * Juniper ScreenOS (Netscreen)
  * Mikrotik RouterOS
  * Ubiquiti AirOS
+ * Palo Alto PAN-OS
 
 
 # Installation
@@ -99,7 +101,7 @@ To initialize a default configuration in your home directory ```~/.config/oxidiz
 
 ## Source
 
-Oxidized supports ```CSV``` and ```SQLite``` as source backends. The CSV backend reads nodes from a rancid compatible router.db file. The SQLite backend will fire queries against a database and map certain fields to model items. Take a look at the [Cookbook](#cookbook) for more details.
+Oxidized supports ```CSV```, ```SQLite``` and ```HTTP``` as source backends. The CSV backend reads nodes from a rancid compatible router.db file. The SQLite backend will fire queries against a database and map certain fields to model items. The HTTP backend will fire queries against a http/https url. Take a look at the [Cookbook](#cookbook) for more details.
 
 ## Outputs
 
@@ -113,7 +115,7 @@ mkdir ~/.config/oxidized/configs
 oxidized
 ```
 
-Now tell Oxidized where it finds a list of network devices to backup configuration from. You can either use CSV or SQLite as source. To create a CVS source add the following snippet:
+Now tell Oxidized where it finds a list of network devices to backup configuration from. You can either use CSV or SQLite as source. To create a CSV source add the following snippet:
 
 ```
 source:
@@ -220,6 +222,28 @@ source:
       enable: enable
 ```
 
+### Source: HTTP
+
+One object per device.
+
+```
+source:
+  default: http
+  http:
+    url: https://url/api
+    scheme: https
+    delimiter: !ruby/regexp /:/
+    map:
+      name: hostname
+      model: os
+      username: username
+      password: password
+    vars_map:
+      enable: enable
+    headers:
+      X-Auth-Token: 'somerandomstring'
+```
+
 ### Output: File
 
 Parent directory needs to be created manually, one file per device, with most recent running config.
@@ -313,7 +337,7 @@ The following objects exist in Oxidized.
    * input - method to acquire config, loaded dynamically as needed (Also default in config file)
    * output - method to store config, loaded dynamically as needed (Also default in config file)
    * prompt - prompt used for node (Also default in config file, can be specified in model too)
- * 'sql' and 'csv' (supports any format with single entry per line, like router.db)
+ * 'sql', 'csv' and 'http' (supports any format with single entry per line, like router.db)
 
 ## Model
  * lists commands to gather from given device model
